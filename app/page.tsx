@@ -302,7 +302,46 @@ export default function Page() {
             {level === 1 && (
               <div className="card">
                 <h2>Level 1 - Logical Gate Simulator (150 points)</h2>
-                <p>Convert decimal 13 into binary. Then apply: (A AND B) OR (C XOR D) where A=1,B=1,C=0,D=1.</p>
+                <p>Convert decimal 13 into binary and solve the logic-gate flow shown below.</p>
+                <div className="gate-diagram" aria-label="Level 1 gate diagram">
+                  <svg viewBox="0 0 980 420" role="img">
+                    <rect x="80" y="30" width="42" height="34" />
+                    <rect x="140" y="30" width="42" height="34" />
+                    <line x1="101" y1="64" x2="101" y2="120" />
+                    <line x1="161" y1="64" x2="161" y2="120" />
+                    <rect x="85" y="120" width="92" height="84" />
+                    <text x="116" y="170">OR</text>
+
+                    <rect x="360" y="30" width="42" height="34" />
+                    <rect x="420" y="30" width="42" height="34" />
+                    <line x1="381" y1="64" x2="381" y2="120" />
+                    <line x1="441" y1="64" x2="441" y2="120" />
+                    <rect x="366" y="120" width="92" height="84" />
+                    <text x="393" y="170">AND</text>
+
+                    <line x1="177" y1="162" x2="292" y2="162" />
+                    <line x1="292" y1="162" x2="292" y2="240" />
+                    <line x1="366" y1="162" x2="326" y2="162" />
+                    <line x1="326" y1="162" x2="326" y2="240" />
+                    <rect x="276" y="240" width="84" height="76" />
+                    <text x="293" y="286">AND</text>
+
+                    <line x1="458" y1="162" x2="620" y2="162" />
+                    <line x1="620" y1="162" x2="620" y2="286" />
+                    <line x1="360" y1="278" x2="650" y2="278" />
+                    <rect x="650" y="248" width="70" height="60" />
+                    <text x="668" y="286">OR</text>
+
+                    <line x1="177" y1="162" x2="177" y2="378" />
+                    <rect x="158" y="378" width="40" height="30" />
+
+                    <line x1="360" y1="278" x2="360" y2="378" />
+                    <rect x="340" y="378" width="40" height="30" />
+
+                    <line x1="720" y1="278" x2="780" y2="278" />
+                    <rect x="780" y="262" width="40" height="30" />
+                  </svg>
+                </div>
                 <p>Enter final 4-bit output:</p>
                 <input value={l1Answer} onChange={(e) => setL1Answer(e.target.value)} placeholder="Example: 0101" />
                 <button onClick={validateLevel1}>Submit Level 1</button>

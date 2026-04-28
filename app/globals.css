@@ -101,7 +101,7 @@ button:hover {
 
 .board {
   display: grid;
-  grid-template-columns: repeat(4, 56px);
+  grid-template-columns: repeat(6, 56px);
   gap: 4px;
   margin: 10px 0;
 }
@@ -170,6 +170,12 @@ td {
 
 .success {
   color: #86efac;
+}
+
+.hint {
+  color: #fcd34d;
+  margin: 6px 0;
+  font-size: 0.95rem;
 }
 
 .success-card {

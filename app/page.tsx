@@ -58,6 +58,44 @@ const MODEL_TABLE = [
   { name: "LightGBM", acc: "0.9388", f1: "0.9225" }
 ];
 
+const HINTS: Record<string, [string, string, string]> = {
+  l1: [
+    "First convert decimal 13 into binary.",
+    "Use A=1, B=1, C=0, D=1 from 1101.",
+    "Solve OR and AND branches first, then middle AND, then final OR."
+  ],
+  l2q1: [
+    "`// 2` means integer division by 2.",
+    "Add each half value from the list before final addition.",
+    "After loop sum, add 3."
+  ],
+  l2q2: [
+    "No two queens can share row, column, or diagonal.",
+    "Try placing exactly one queen in each row.",
+    "One valid solution uses indexes: 1, 9, 17, 18, 28, 32."
+  ],
+  l2q3: [
+    "Treat it as a substitution mapping puzzle.",
+    "Compare each letter mapping in CODING and ESCAPE.",
+    "Final answer is a 4-letter code."
+  ],
+  l3q1: [
+    "Each element is reduced by its index.",
+    "Transformed array becomes [3, 4, 5, 6].",
+    "Now take the sum."
+  ],
+  l3q2: [
+    "Model accuracy should not exceed 1.0.",
+    "Find the impossible metric value in the table.",
+    "Enter the poisoned value exactly with decimals."
+  ],
+  l3q3: [
+    "Scan string literals in the SQL query.",
+    "Look near the alias `audit_token`.",
+    "The password appears as text after `password=`."
+  ]
+};
+
 function formatTime(seconds: number): string {
   const safe = Math.max(0, seconds);
   const h = String(Math.floor(safe / 3600)).padStart(2, "0");
@@ -162,6 +200,19 @@ export default function Page() {
     setTimeLeft((t) => Math.max(0, t - secCost));
   };
 
+  const renderHintText = (questionKey: string) => {
+    const used = hints[questionKey]?.used ?? [false, false, false];
+    const hintSet = HINTS[questionKey];
+    if (!hintSet) return null;
+    return (
+      <div>
+        {used[0] && <p className="hint">{hintSet[0]}</p>}
+        {used[1] && <p className="hint">{hintSet[1]}</p>}
+        {used[2] && <p className="hint">{hintSet[2]}</p>}
+      </div>
+    );
+  };
+
   const startGame = (e: FormEvent) => {
     e.preventDefault();
     if (!teamName.trim()) return;
@@ -193,9 +244,10 @@ export default function Page() {
   };
 
   const validateQueens = () => {
-    const solution = [1, 7, 8, 14];
+    const solution = [1, 9, 17, 18, 28, 32];
     const sorted = [...queenPositions].sort((a, b) => a - b);
-    if (sorted.length === 4 && solution.every((v, i) => sorted[i] === v)) {
+    const solutionSorted = [...solution].sort((a, b) => a - b);
+    if (sorted.length === 6 && solutionSorted.every((v, i) => sorted[i] === v)) {
       setL2q2Done(true);
       setStage(4);
       return;
@@ -355,6 +407,7 @@ export default function Page() {
                   <button onClick={() => useHint("l1", 1)}>Hint 2</button>
                   <button onClick={() => useHint("l1", 2)}>Hint 3</button>
                 </div>
+                {renderHintText("l1")}
                 <button onClick={validateLevel1}>Submit Level 1</button>
                 {l1Done && (
                   <p className="success">
@@ -376,7 +429,7 @@ export default function Page() {
                   <button onClick={() => useHint("l2q1", 1)}>Hint 2</button>
                   <button onClick={() => useHint("l2q1", 2)}>Hint 3</button>
                 </div>
-
+                {renderHintText("l2q1")}
               </div>
             )}
 
@@ -384,12 +437,12 @@ export default function Page() {
               <div className="card l2">
                 <h2>Level 2 - Q2.2</h2>
                 <h3>Visual N-Queens</h3>
-                <p>Place 4 queens on the 4x4 board correctly.</p>
+                <p>Place 6 queens on the 6x6 board correctly.</p>
                 <div className="board">
-                  {Array.from({ length: 16 }).map((_, idx) => (
+                  {Array.from({ length: 36 }).map((_, idx) => (
                     <button
                       key={idx}
-                      className={`cell ${(Math.floor(idx / 4) + (idx % 4)) % 2 === 0 ? "light" : "dark"}`}
+                      className={`cell ${(Math.floor(idx / 6) + (idx % 6)) % 2 === 0 ? "light" : "dark"}`}
                       onClick={() => toggleQueen(idx)}
                     >
                       {queenPositions.includes(idx) ? "Q" : ""}
@@ -401,6 +454,7 @@ export default function Page() {
                   <button onClick={() => useHint("l2q2", 1)}>Hint 2</button>
                   <button onClick={() => useHint("l2q2", 2)}>Hint 3</button>
                 </div>
+                {renderHintText("l2q2")}
                 <button onClick={validateQueens}>Check Q2.2</button>
               </div>
             )}
@@ -415,6 +469,7 @@ export default function Page() {
                   <button onClick={() => useHint("l2q3", 1)}>Hint 2</button>
                   <button onClick={() => useHint("l2q3", 2)}>Hint 3</button>
                 </div>
+                {renderHintText("l2q3")}
                 <button onClick={validateL2Q3}>Check Q2.3</button>
               </div>
             )}
@@ -433,6 +488,7 @@ print(sum(arr))`}</pre>
                   <button onClick={() => useHint("l3q1", 1)}>Hint 2</button>
                   <button onClick={() => useHint("l3q1", 2)}>Hint 3</button>
                 </div>
+                {renderHintText("l3q1")}
                 <button onClick={validateL3Q1}>Check Q3.1</button>
               </div>
             )}
@@ -465,6 +521,7 @@ print(sum(arr))`}</pre>
                   <button onClick={() => useHint("l3q2", 1)}>Hint 2</button>
                   <button onClick={() => useHint("l3q2", 2)}>Hint 3</button>
                 </div>
+                {renderHintText("l3q2")}
                 <button onClick={validateL3Q2}>Check Q3.2</button>
               </div>
             )}
@@ -480,6 +537,7 @@ print(sum(arr))`}</pre>
                   <button onClick={() => useHint("l3q3", 1)}>Hint 2</button>
                   <button onClick={() => useHint("l3q3", 2)}>Hint 3</button>
                 </div>
+                {renderHintText("l3q3")}
                 <button onClick={validateL3Q3}>Check Q3.3</button>
               </div>
             )}
@@ -494,11 +552,6 @@ print(sum(arr))`}</pre>
                   onError={() => setLevel4ImageMissing(true)}
                 />
                 <input value={l4} onChange={(e) => setL4(e.target.value)} placeholder="Hidden word?" />
-                <div className="row">
-                  <button onClick={() => useHint("l4", 0)}>Hint 1</button>
-                  <button onClick={() => useHint("l4", 1)}>Hint 2</button>
-                  <button onClick={() => useHint("l4", 2)}>Hint 3</button>
-                </div>
                 <button onClick={validateL4}>Check Level 4</button>
                 {l4Done && (
                   <p className="success">

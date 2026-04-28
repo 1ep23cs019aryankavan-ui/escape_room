@@ -278,7 +278,9 @@ export default function Page() {
   return (
     <main className={`app level-${Math.min(level, 4)}`}>
       <header className="topbar">
-        <marquee>{marqueeText}</marquee>
+        <div className="marquee-wrap">
+          <div className="marquee-track">{marqueeText}</div>
+        </div>
       </header>
       <section className="container">
         <h1>Hackovers: Technical Escape Room</h1>

@@ -82,7 +82,7 @@ function useHints() {
 export default function Page() {
   const [teamName, setTeamName] = useState("");
   const [started, setStarted] = useState(false);
-  const [level, setLevel] = useState(1);
+  const [stage, setStage] = useState(1);
   const [points, setPoints] = useState(0);
   const [timeLeft, setTimeLeft] = useState(TOTAL_TIME_SECONDS);
   const [wrongCount, setWrongCount] = useState(0);
@@ -107,11 +107,13 @@ export default function Page() {
 
   const [l4, setL4] = useState("");
   const [l4Done, setL4Done] = useState(false);
+  const [level4ImageMissing, setLevel4ImageMissing] = useState(false);
 
   const [finalCodes, setFinalCodes] = useState({ c1: "", c2: "", c3: "", c4: "" });
   const [escaped, setEscaped] = useState(false);
 
   const { hints, applyHint } = useHints();
+  const level = stage <= 1 ? 1 : stage <= 4 ? 2 : stage <= 7 ? 3 : 4;
 
   useEffect(() => {
     if (!started || escaped) return;
@@ -170,7 +172,7 @@ export default function Page() {
     if (l1Answer.trim() === "0101") {
       setL1Done(true);
       setPoints((p) => p + LEVEL_POINTS.level1);
-      setLevel(2);
+      setStage(2);
       return;
     }
     deductWrong();
@@ -180,6 +182,7 @@ export default function Page() {
     if (l2q1.trim() === "13") {
       setL2q1Done(true);
       setPoints((p) => p + LEVEL_POINTS.l2q1);
+      setStage(3);
       return;
     }
     deductWrong();
@@ -194,6 +197,7 @@ export default function Page() {
     const sorted = [...queenPositions].sort((a, b) => a - b);
     if (sorted.length === 4 && solution.every((v, i) => sorted[i] === v)) {
       setL2q2Done(true);
+      setStage(4);
       return;
     }
     deductWrong();
@@ -203,7 +207,7 @@ export default function Page() {
     if (l2q3.trim().toUpperCase() === "EBFK") {
       setPoints((p) => p + LEVEL_POINTS.l2q3);
       setL2Done(true);
-      setLevel(3);
+      setStage(5);
       return;
     }
     deductWrong();
@@ -213,6 +217,7 @@ export default function Page() {
     if (l3q1.trim() === "24") {
       setL3q1Done(true);
       setPoints((p) => p + LEVEL_POINTS.l3q1);
+      setStage(6);
       return;
     }
     deductWrong();
@@ -222,6 +227,7 @@ export default function Page() {
     if (l3q2.trim() === "1.2300") {
       setL3q2Done(true);
       setPoints((p) => p + LEVEL_POINTS.l3q2);
+      setStage(7);
       return;
     }
     deductWrong();
@@ -231,7 +237,7 @@ export default function Page() {
     if (l3q3.trim().toUpperCase() === "SQLPASS") {
       setL3Done(true);
       setPoints((p) => p + LEVEL_POINTS.l3q3);
-      setLevel(4);
+      setStage(8);
       return;
     }
     deductWrong();
@@ -241,7 +247,7 @@ export default function Page() {
     if (l4.trim().toUpperCase() === "HACKOVERS") {
       setL4Done(true);
       setPoints((p) => p + LEVEL_POINTS.level4);
-      setLevel(5);
+      setStage(9);
       return;
     }
     deductWrong();
@@ -299,7 +305,7 @@ export default function Page() {
               <span>Timer: {formatTime(timeLeft)}</span>
             </div>
 
-            {level === 1 && (
+            {stage === 1 && (
               <div className="card">
                 <h2>Level 1 - Logical Gate Simulator (150 points)</h2>
                 <p>Convert decimal 13 into binary and solve the logic-gate flow shown below.</p>
@@ -344,6 +350,11 @@ export default function Page() {
                 </div>
                 <p>Enter final 4-bit output:</p>
                 <input value={l1Answer} onChange={(e) => setL1Answer(e.target.value)} placeholder="Example: 0101" />
+                <div className="row">
+                  <button onClick={() => useHint("l1", 0)}>Hint 1</button>
+                  <button onClick={() => useHint("l1", 1)}>Hint 2</button>
+                  <button onClick={() => useHint("l1", 2)}>Hint 3</button>
+                </div>
                 <button onClick={validateLevel1}>Submit Level 1</button>
                 {l1Done && (
                   <p className="success">
@@ -353,9 +364,9 @@ export default function Page() {
               </div>
             )}
 
-            {level >= 2 && (
+            {stage === 2 && (
               <div className="card l2">
-                <h2>Level 2 (3 Questions)</h2>
+                <h2>Level 2 - Q2.1</h2>
                 <h3>Q2.1 Debug Python (50 points)</h3>
                 <textarea readOnly value={DEBUG_PYTHON} />
                 <input value={l2q1} onChange={(e) => setL2q1(e.target.value)} placeholder="Output?" />
@@ -366,101 +377,128 @@ export default function Page() {
                   <button onClick={() => useHint("l2q1", 2)}>Hint 3</button>
                 </div>
 
-                {l2q1Done && (
-                  <>
-                    <h3>Q2.2 Visual N-Queens</h3>
-                    <p>Place 4 queens on the 4x4 board correctly.</p>
-                    <div className="board">
-                      {Array.from({ length: 16 }).map((_, idx) => (
-                        <button
-                          key={idx}
-                          className={`cell ${(Math.floor(idx / 4) + (idx % 4)) % 2 === 0 ? "light" : "dark"}`}
-                          onClick={() => toggleQueen(idx)}
-                        >
-                          {queenPositions.includes(idx) ? "Q" : ""}
-                        </button>
-                      ))}
-                    </div>
-                    <button onClick={validateQueens}>Check Q2.2</button>
-                  </>
-                )}
-
-                {l2q2Done && (
-                  <>
-                    <h3>Q2.3 Pattern</h3>
-                    <p>
-                      If CODING is written as ABFDEC and ESCAPE is written as KHJIGK then what is NODE?
-                    </p>
-                    <input value={l2q3} onChange={(e) => setL2q3(e.target.value)} />
-                    <button onClick={validateL2Q3}>Check Q2.3</button>
-                    {l2Done && (
-                      <p className="success">
-                        Level 2 code: <b>{LEVEL_CODES.level2}</b>. Level 3 unlocked.
-                      </p>
-                    )}
-                  </>
-                )}
               </div>
             )}
 
-            {level >= 3 && (
+            {stage === 3 && (
+              <div className="card l2">
+                <h2>Level 2 - Q2.2</h2>
+                <h3>Visual N-Queens</h3>
+                <p>Place 4 queens on the 4x4 board correctly.</p>
+                <div className="board">
+                  {Array.from({ length: 16 }).map((_, idx) => (
+                    <button
+                      key={idx}
+                      className={`cell ${(Math.floor(idx / 4) + (idx % 4)) % 2 === 0 ? "light" : "dark"}`}
+                      onClick={() => toggleQueen(idx)}
+                    >
+                      {queenPositions.includes(idx) ? "Q" : ""}
+                    </button>
+                  ))}
+                </div>
+                <div className="row">
+                  <button onClick={() => useHint("l2q2", 0)}>Hint 1</button>
+                  <button onClick={() => useHint("l2q2", 1)}>Hint 2</button>
+                  <button onClick={() => useHint("l2q2", 2)}>Hint 3</button>
+                </div>
+                <button onClick={validateQueens}>Check Q2.2</button>
+              </div>
+            )}
+
+            {stage === 4 && (
+              <div className="card l2">
+                <h2>Level 2 - Q2.3</h2>
+                <p>If CODING is written as ABFDEC and ESCAPE is written as KHJIGK then what is NODE?</p>
+                <input value={l2q3} onChange={(e) => setL2q3(e.target.value)} />
+                <div className="row">
+                  <button onClick={() => useHint("l2q3", 0)}>Hint 1</button>
+                  <button onClick={() => useHint("l2q3", 1)}>Hint 2</button>
+                  <button onClick={() => useHint("l2q3", 2)}>Hint 3</button>
+                </div>
+                <button onClick={validateL2Q3}>Check Q2.3</button>
+              </div>
+            )}
+
+            {stage === 5 && (
               <div className="card l3">
-                <h2>Level 3 (3 Questions)</h2>
+                <h2>Level 3 - Q3.1</h2>
                 <h3>Q3.1 Python Array Output (50 points)</h3>
                 <pre>{`arr = [3, 5, 7, 9]
 for i in range(len(arr)):
     arr[i] = arr[i] - i
 print(sum(arr))`}</pre>
                 <input value={l3q1} onChange={(e) => setL3q1(e.target.value)} placeholder="Output?" />
+                <div className="row">
+                  <button onClick={() => useHint("l3q1", 0)}>Hint 1</button>
+                  <button onClick={() => useHint("l3q1", 1)}>Hint 2</button>
+                  <button onClick={() => useHint("l3q1", 2)}>Hint 3</button>
+                </div>
                 <button onClick={validateL3Q1}>Check Q3.1</button>
-
-                {l3q1Done && (
-                  <>
-                    <h3>Q3.2 Find Poisoned ML Metric (50 points)</h3>
-                    <table>
-                      <thead>
-                        <tr>
-                          <th>Model</th>
-                          <th>Accuracy</th>
-                          <th>F1</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {MODEL_TABLE.map((m) => (
-                          <tr key={m.name}>
-                            <td>{m.name}</td>
-                            <td>{m.acc}</td>
-                            <td>{m.f1}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                    <input value={l3q2} onChange={(e) => setL3q2(e.target.value)} placeholder="Poison value?" />
-                    <button onClick={validateL3Q2}>Check Q3.2</button>
-                  </>
-                )}
-
-                {l3q2Done && (
-                  <>
-                    <h3>Q3.3 SQL Password Hunt (50 points)</h3>
-                    <textarea readOnly value={SQL_CHALLENGE} />
-                    <input value={l3q3} onChange={(e) => setL3q3(e.target.value)} placeholder="Password?" />
-                    <button onClick={validateL3Q3}>Check Q3.3</button>
-                    {l3Done && (
-                      <p className="success">
-                        Level 3 code: <b>{LEVEL_CODES.level3}</b>. Level 4 unlocked.
-                      </p>
-                    )}
-                  </>
-                )}
               </div>
             )}
 
-            {level >= 4 && (
+            {stage === 6 && (
+              <div className="card l3">
+                <h2>Level 3 - Q3.2</h2>
+                <h3>Find Poisoned ML Metric (50 points)</h3>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Model</th>
+                      <th>Accuracy</th>
+                      <th>F1</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {MODEL_TABLE.map((m) => (
+                      <tr key={m.name}>
+                        <td>{m.name}</td>
+                        <td>{m.acc}</td>
+                        <td>{m.f1}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                <input value={l3q2} onChange={(e) => setL3q2(e.target.value)} placeholder="Poison value?" />
+                <div className="row">
+                  <button onClick={() => useHint("l3q2", 0)}>Hint 1</button>
+                  <button onClick={() => useHint("l3q2", 1)}>Hint 2</button>
+                  <button onClick={() => useHint("l3q2", 2)}>Hint 3</button>
+                </div>
+                <button onClick={validateL3Q2}>Check Q3.2</button>
+              </div>
+            )}
+
+            {stage === 7 && (
+              <div className="card l3">
+                <h2>Level 3 - Q3.3</h2>
+                <h3>SQL Password Hunt (50 points)</h3>
+                <textarea readOnly value={SQL_CHALLENGE} />
+                <input value={l3q3} onChange={(e) => setL3q3(e.target.value)} placeholder="Password?" />
+                <div className="row">
+                  <button onClick={() => useHint("l3q3", 0)}>Hint 1</button>
+                  <button onClick={() => useHint("l3q3", 1)}>Hint 2</button>
+                  <button onClick={() => useHint("l3q3", 2)}>Hint 3</button>
+                </div>
+                <button onClick={validateL3Q3}>Check Q3.3</button>
+              </div>
+            )}
+
+            {stage === 8 && (
               <div className="card l4">
                 <h2>Level 4 - Hidden Word in Photo (100 points)</h2>
-                <img src="/hidden-photo.svg" alt="Find hidden word" className="photo" />
+                <img
+                  src={level4ImageMissing ? "/hidden-photo.svg" : "/level4-image.jpg"}
+                  alt="Find hidden word"
+                  className="photo"
+                  onError={() => setLevel4ImageMissing(true)}
+                />
                 <input value={l4} onChange={(e) => setL4(e.target.value)} placeholder="Hidden word?" />
+                <div className="row">
+                  <button onClick={() => useHint("l4", 0)}>Hint 1</button>
+                  <button onClick={() => useHint("l4", 1)}>Hint 2</button>
+                  <button onClick={() => useHint("l4", 2)}>Hint 3</button>
+                </div>
                 <button onClick={validateL4}>Check Level 4</button>
                 {l4Done && (
                   <p className="success">
@@ -470,7 +508,7 @@ print(sum(arr))`}</pre>
               </div>
             )}
 
-            {l1Done && l2Done && l3Done && l4Done && !escaped && (
+            {stage === 9 && !escaped && (
               <div className="card final">
                 <h2>Final Escape Check</h2>
                 <p>Enter all level codes to escape:</p>
